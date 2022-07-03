@@ -18,14 +18,13 @@ $(document).ready(() => {
 	while($("#schedule").scrollTop() === 0) {
 		$("#schedule").append(createNextDay(currentTime));
 		currentTime.add(1, "d");
-		$("#schedule").scrollTop(10);
+		$("#schedule").scrollTop(5);
 	}
-	$("#schedule").scrollTop(0);
+	$("#schedule").prepend(createNextDay(moment().add(-1, "d")));
+	$("#schedule").scrollTop($("#schedule").innerHeight() / 4);
 
-	// Establish events.
-	$("#schedule button").on("click", toggleButton);
+	// Establish scroll event.
 	$("#schedule").on("scroll", dataPullCull);
-	$("#schedule textarea").on("change keyup paste", updateDatabase);
 });
 
 // Creates a day of timeslots (and the HTML) amd returns it all as an array.
@@ -82,6 +81,7 @@ function createHour(time, state=NORMAL_HOURS) {
 	let row = undefined;
 
 	if (state === NORMAL_HOURS) {
+		let icon = $("<i>").addClass("fa-solid fa-cutlery");
 		if ([time] in timeSlots) {
 			row = $("<div>").addClass("row row-no-gutters mx-lg-5").data("date", time);
 			$("<div>").addClass("col-lg-1 px-md-3 col-3 hour rounded-0 bg-light time-block").text(moment(time, "X").format("hA")).appendTo(row);
@@ -90,12 +90,12 @@ function createHour(time, state=NORMAL_HOURS) {
 			if ([time] in timeSlots && localStorage.getItem(time))
 				$("<button>").addClass("col-lg-1 px-lg-3 col-3 saveBtn btn-block rounded-0").attr("type", "button").text("🔒").appendTo(row);
 			else
-				$("<button>").addClass("col-lg-1 px-lg-3 col-3 btn-block btn-info rounded-0").attr("type", "button").text("🔓").appendTo(row);
+				$("<button>").addClass("col-lg-1 px-lg-3 col-3 btn-block btn-info rounded-0 fa-solid fa-lock-open").attr("type", "button").append(icon).appendTo(row);
 		} else {
 			row = $("<div>").addClass("row row-no-gutters mx-lg-5").data("date", time);
 			$("<div>").addClass("col-lg-1 px-lg-3 col-3 hour rounded-0 bg-light time-block").text(moment(time, "X").format("hA")).appendTo(row);
 			$("<textarea>").addClass("col-lg-10 col-6 rounded-0").appendTo(row);
-			$("<button>").addClass("col-lg-1 px-lg-3 col-3 btn-block btn-info rounded-0").attr("type", "button").text("🔓").appendTo(row);
+			$("<button>").addClass("col-lg-1 px-lg-3 col-3 btn-block btn-info rounded-0").attr("type", "button").append("<i class=\"fa-solid fa-cutlery\"></i>").appendTo(row);
 		}
 	} else if (state === AFTER_HOURS) {
 		row = $("<div>").addClass("row row-no-gutters mx-lg-5 offHours").data("date", time);
@@ -108,6 +108,10 @@ function createHour(time, state=NORMAL_HOURS) {
 		$("<div>").addClass("col-lg-10 col-6 rounded-0").appendTo(row);
 		$("<div>").addClass("col-lg-1 col-3 bg-dark rounded-0").text("").appendTo(row);
 	}
+
+	// Include events for timeslot.
+	row.children().eq(1).on("change keyup paste", updateDatabase);
+	row.children().eq(2).click(toggleButton);
 
 	return row;
 }
@@ -190,4 +194,5 @@ function dataPullCull() {
 function updateDatabase() {
 	let hour =  $(this).parent().data("date");
 	timeSlots[hour] = $(this).val();
+	console.log("TIMESLOT:", hour, timeSlots, $(this).val());
 }
