@@ -87,14 +87,14 @@ function createHour(time, state=NORMAL_HOURS) {
 			$("<textarea>").addClass("col-lg-10 col-6 rounded-0").val(timeSlots[time]).appendTo(row);
 
 			if ([time] in timeSlots && localStorage.getItem(time))
-				$("<button>").addClass("col-lg-1 px-lg-3 col-3 saveBtn btn-block rounded-0").attr("type", "button").text("🔒").appendTo(row);
+				$("<button>").addClass("col-lg-1 px-lg-3 col-3 saveBtn btn-block rounded-0 fa-solid fa-lock").attr("type", "button").appendTo(row);
 			else
-				$("<button>").addClass("col-lg-1 px-lg-3 col-3 btn-block btn-info rounded-0 fa-solid fa-lock-open").attr("type", "button").text("🔓").appendTo(row);
+				$("<button>").addClass("col-lg-1 px-lg-3 col-3 btn-block saveBtn rounded-0 fa-solid fa-lock-open").attr("type", "button").appendTo(row);
 		} else {
 			row = $("<div>").addClass("row row-no-gutters mx-lg-5").data("date", time);
 			$("<div>").addClass("col-lg-1 px-lg-3 col-3 hour rounded-0 bg-light time-block").text(moment(time, "X").format("hA")).appendTo(row);
 			$("<textarea>").addClass("col-lg-10 col-6 rounded-0").appendTo(row);
-			$("<button>").addClass("col-lg-1 px-lg-3 col-3 btn-block btn-info rounded-0").attr("type", "button").text("🔓").appendTo(row);
+			$("<button>").addClass("col-lg-1 px-lg-3 col-3 btn-block saveBtn rounded-0 fa-solid fa-lock-open").attr("type", "button").appendTo(row);
 		}
 	} else if (state === AFTER_HOURS) {
 		row = $("<div>").addClass("row row-no-gutters mx-lg-5 offHours").data("date", time);
@@ -147,11 +147,11 @@ function toggleButton() {
 
 	if (localStorage.getItem(hour) !== null) {
 		localStorage.removeItem(hour);
-		$(this).removeClass("saveBtn").addClass("btn-info").text("🔓");
+		$(this).removeClass("fa-solid fa-lock").addClass("fa-solid fa-lock-open");
 	} else {
 		if ($(this).parent().children("textarea").val() !== "") {
 			localStorage.setItem(hour, $(this).parent().children("textarea").val());
-			$(this).removeClass("btn-info").addClass("saveBtn").text("🔒");
+			$(this).removeClass("fa-solid fa-lock-open").addClass("fa-solid fa-lock");
 		}
 	}
 }
