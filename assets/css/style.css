@@ -19,6 +19,13 @@ textarea {
   color: black;
   border-radius: 0;
   border-bottom: 10px solid black;
+  height: 304px;
+}
+
+.container-fluid {
+	height: calc(100vh - 336px);
+	overflow-x: hidden;
+	overflow-y: scroll;
 }
 
 .description {
@@ -31,7 +38,6 @@ textarea {
 }
 
 .row {
-  white-space: pre-wrap;
   height: 80px;
   border-top: 1px solid white;
 }
@@ -40,6 +46,7 @@ textarea {
   background-color: #ffffff;
   color: #000000;
   border-top: 1px dashed #000000;
+  line-height: 80px;
 }
 
 .past {
@@ -55,6 +62,12 @@ textarea {
 .future {
   background-color: #77dd77;
   color: white;
+}
+
+.offHours {
+  background-color: #777;
+  color: white;
+  height: 160px;
 }
 
 .saveBtn {
