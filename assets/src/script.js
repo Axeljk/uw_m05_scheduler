@@ -7,14 +7,12 @@ const NORMAL_HOURS = 0;
 const AFTER_HOURS = 1;
 const WEEKEND = 2;
 
-var timeSlots = {};		// Objects holding timeslots.
+var timeSlots = {};		// Objects holding timeslots (current session data).
 var currentTime;		// Used to communicate with jumbo.
 
 // Set events up once page is loaded.
 $(document).ready(() => {
 	currentTime = moment();
-
-	console.log($("#schedule").scrollTop(200))
 
 	// Add day(s) until page is filled (able to scroll container).
 	while($("#schedule").scrollTop() === 0) {
@@ -22,9 +20,12 @@ $(document).ready(() => {
 		currentTime.add(1, "d");
 		$("#schedule").scrollTop(10);
 	}
+	$("#schedule").scrollTop(0);
 
-	//$("#schedule").scrollTop(0);
-	updateDate();
+	// Establish events.
+	$("#schedule button").on("click", toggleButton);
+	$("#schedule").on("scroll", dataPullCull);
+	$("#schedule textarea").on("change keyup paste", updateDatabase);
 });
 
 // Creates a day of timeslots (and the HTML) amd returns it all as an array.
@@ -79,7 +80,6 @@ function createNextDay(date) {
  */
 function createHour(time, state=NORMAL_HOURS) {
 	let row = undefined;
-//	alert(time)
 
 	if (state === NORMAL_HOURS) {
 		if ([time] in timeSlots) {
@@ -139,7 +139,7 @@ function findRowAt(pos) {
 	Toggle saved state of TimeSlot when (un)lock button pressed.
 		-Uses the unix time as the key. Value is the text entered.
  */
-$("#schedule button").on("click", () => {
+function toggleButton() {
 	let hour = $(this).parent().data("date");
 
 	if (localStorage.getItem(hour) !== null) {
@@ -151,10 +151,10 @@ $("#schedule button").on("click", () => {
 			$(this).removeClass("btn-info").addClass("saveBtn").text("🔒");
 		}
 	}
-});
+}
 
 // Scrolling event. Tracks which day is being observed and
-$("#schedule").on("scroll", () => {
+function dataPullCull() {
 	let midPoint = $(this).innerHeight() / 2;
 	let day;
 
@@ -166,7 +166,7 @@ $("#schedule").on("scroll", () => {
 	if ($(this).scrollTop() < 80) {
 		let culled;
 		let prevDay = $(this).children().first().data("date") - SECONDS_IN_DAY;
-		$("#schedule").prepend(createNextDay(prevDay));
+		$(this).prepend(createNextDay(prevDay));
 
 		// Start culling if too many elements are created.
 		culled = findRowAt(ROW_CULL_DIST);
@@ -178,15 +178,16 @@ $("#schedule").on("scroll", () => {
 	if ($(this).scrollTop() + $(this).innerHeight() >= $(this).prop("scrollHeight") - 80) {
 		let culled;
 		let nextDay = $(this).children().last().data("date") + SECONDS_IN_DAY;
-		$("#schedule").append(createNextDay(nextDay));
+		$(this).append(createNextDay(nextDay));
 
 		// Start culling if too many elements are created.
 		culled = findRowAt(-ROW_CULL_DIST);
 		if (culled.length > 0)
 			culled.prevAll().remove();
 	}
-});
+}
 
-$("#schedule textarea").on("input", () => {
-	console.log("Poop");
-});
+function updateDatabase() {
+	let hour =  $(this).parent().data("date");
+	timeSlots[hour] = $(this).val();
+}
